@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完成</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #252542;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b8;
+            --accent: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: rgba(15, 15, 35, 0.95);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stats {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 16px;
+        }
+
+        .stat-label { color: var(--text-secondary); }
+        .stat-value { font-weight: 600; }
+        .stat-value.success { color: var(--success); }
+        .stat-value.danger { color: var(--danger); }
+
+        .rate {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 16px 0;
+        }
+        .rate.good { color: var(--success); }
+        .rate.medium { color: #fbbf24; }
+        .rate.poor { color: var(--danger); }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <div class="icon">🎉</div>
+        <h2>练习完成！</h2>
+        
+        <div class="stats">
+            <div class="stat-row">
+                <span class="stat-label">正确</span>
+                <span class="stat-value success" id="correct">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">错误</span>
+                <span class="stat-value danger" id="wrong">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">已答题数</span>
+                <span class="stat-value" id="total">0</span>
+            </div>
+        </div>
+
+        <div class="rate" id="rate">0%</div>
+
+        <button class="btn" onclick="goHome()">返回首页</button>
+    </div>
+
+    <script>
+        // 从URL获取统计数据
+        const params = new URLSearchParams(window.location.search);
+        const correct = parseInt(params.get('correct')) || 0;
+        const total = parseInt(params.get('total')) || 0;
+        const wrong = total - correct;
+        const rate = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+        document.getElementById('correct').textContent = correct + ' 题';
+        document.getElementById('wrong').textContent = wrong + ' 题';
+        document.getElementById('total').textContent = total + ' 题';
+        
+        const rateEl = document.getElementById('rate');
+        rateEl.textContent = rate + '%';
+        
+        if (rate >= 80) {
+            rateEl.className = 'rate good';
+        } else if (rate >= 60) {
+            rateEl.className = 'rate medium';
+        } else {
+            rateEl.className = 'rate poor';
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>毛概刷题 - 高效记忆</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #252542;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b8;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #fbbf24;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* 继续上次 */
+        .resume-card {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: none;
+        }
+
+        .resume-card.show {
+            display: block;
+        }
+
+        .resume-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .resume-card h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .resume-card p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* 功能菜单 */
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-item {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid transparent;
+        }
+
+        .menu-item:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .menu-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .menu-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .menu-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .menu-arrow {
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 20px;
+        }
+
+        /* 底部统计 */
+        .footer-stats {
+            margin-top: 32px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .footer-stats p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .footer-stats span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1>📚 毛概刷题</h1>
+            <p>高效记忆 · 快速通过</p>
+        </header>
+
+        <!-- 统计概览 -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="total-questions">0</div>
+                <div class="stat-label">总题数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracy-rate">0%</div>
+                <div class="stat-label">正确率</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="wrong-count">0</div>
+                <div class="stat-label">错题数</div>
+            </div>
+        </div>
+
+        <!-- 继续上次（有进度时显示） -->
+        <div class="resume-card" id="resume-card" onclick="resumePractice()">
+            <h3>▶️ 继续上次进度</h3>
+            <p>上次刷到第 <span id="resume-index">0</span> 题</p>
+        </div>
+
+        <!-- 功能菜单 -->
+        <nav class="menu">
+            <a href="practice.html?mode=sequential" class="menu-item">
+                <div class="menu-icon">📖</div>
+                <div class="menu-info">
+                    <h3>顺序刷题</h3>
+                    <p>按顺序逐题学习，记住每道题</p>
+                </div>
+                <span class="menu-arrow">›</span>
+            </a>
+
+            <a href="practice.html?mode=random" class="menu-item">
+                <div class="menu-icon">🎲</div>
+                <div class="menu-info">
+                    <h3>随机练习</h3>
+                    <p>随机抽取50题测试</p>
+                </div>
+                <span class="menu-arrow">›</span>
+            </a>
+
+            <a href="memory.html" class="menu-item">
+                <div class="menu-icon">🧠</div>
+                <div class="menu-info">
+                    <h3>背题模式</h3>
+                    <p>卡片式快速浏览记忆</p>
+                </div>
+                <span class="menu-arrow">›</span>
+            </a>
+
+            <a href="practice.html?mode=wrong" class="menu-item">
+                <div class="menu-icon">❌</div>
+                <div class="menu-info">
+                    <h3>错题刷题</h3>
+                    <p>练习做错的题目</p>
+                </div>
+                <span class="menu-arrow">›</span>
+            </a>
+
+            <a href="memory.html?mode=wrong" class="menu-item">
+                <div class="menu-icon">📕</div>
+                <div class="menu-info">
+                    <h3>错题背诵</h3>
+                    <p>快速浏览错题答案</p>
+                </div>
+                <span class="menu-arrow">›</span>
+            </a>
+
+            <a href="stats.html" class="menu-item">
+                <div class="menu-icon">📊</div>
+                <div class="menu-info">
+                    <h3>学习统计</h3>
+                    <p>查看学习数据和错题排行</p>
+                </div>
+                <span class="menu-arrow">›</span>
+            </a>
+        </nav>
+
+        <!-- 底部统计 -->
+        <div class="footer-stats">
+            <p>已答题 <span id="total-attempts">0</span> 次 · 正确 <span id="total-correct">0</span> 次</p>
+        </div>
+
+        <!-- 版本号 -->
+        <div style="text-align:center;padding:16px;color:#666;font-size:12px;">
+            v1.1.0 · 2024.12.31
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/questions.js"></script>
+    <script>
+        // 初始化页面
+        function init() {
+            // 显示题目总数
+            const totalQuestions = maogaiQuestions ? maogaiQuestions.length : 0;
+            document.getElementById('total-questions').textContent = totalQuestions;
+
+            // 显示统计数据
+            const globalStats = Storage.getGlobalStats();
+            const accuracy = Storage.getAccuracyRate();
+            const wrongIds = Storage.getWrongQuestionIds();
+
+            document.getElementById('accuracy-rate').textContent = accuracy + '%';
+            document.getElementById('wrong-count').textContent = wrongIds.length;
+            document.getElementById('total-attempts').textContent = globalStats.totalAttempts;
+            document.getElementById('total-correct').textContent = globalStats.totalCorrect;
+
+            // 检查是否有未完成进度
+            const progress = Storage.loadProgress();
+            if (progress.sequential > 0) {
+                document.getElementById('resume-card').classList.add('show');
+                document.getElementById('resume-index').textContent = progress.sequential + 1;
+            }
+        }
+
+        // 继续上次进度
+        function resumePractice() {
+            const progress = Storage.loadProgress();
+            window.location.href = `practice.html?mode=sequential&start=${progress.sequential}`;
+        }
+
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

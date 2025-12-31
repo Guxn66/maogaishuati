@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背题模式 - 毛概刷题</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #252542;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b8;
+            --accent: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* 关键词高亮 */
+        mark.keyword {
+            background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .progress-text { font-size: 18px; font-weight: 600; }
+
+        .main {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 80px;
+            overflow-y: auto;
+        }
+
+        /* 题目卡片 */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .card-type {
+            display: inline-block;
+            padding: 6px 14px;
+            background: var(--accent);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .card-question {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        /* 答案卡片 */
+        .answer-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .answer-header {
+            color: var(--success);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .answer-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 16px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-item {
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .option-item.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success);
+        }
+
+        .option-letter {
+            font-weight: 700;
+            min-width: 24px;
+            color: var(--text-secondary);
+        }
+
+        .option-item.correct .option-letter {
+            color: var(--success);
+        }
+
+        /* 底部导航 */
+        .footer {
+            position: sticky;
+            bottom: 0;
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-prev {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .btn-next {
+            background: var(--accent);
+            color: white;
+        }
+
+        .hint {
+            text-align: center;
+            padding: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .list-btn {
+            background: var(--bg-card);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .icon-btn {
+            background: var(--bg-card);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .icon-btn.mastered {
+            background: var(--success);
+            color: white;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 99;
+        }
+
+        .overlay.show { opacity: 1; pointer-events: auto; }
+
+        .question-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 320px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-panel.open { transform: translateX(0); }
+
+        .panel-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .close-btn {
+            background: var(--bg-card);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .question-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            align-content: start;
+        }
+
+        .q-num {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .q-num:hover { background: var(--accent); }
+        .q-num.current { background: var(--accent); outline: 2px solid white; }
+
+        @media (max-width: 480px) {
+            .question-panel { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <span class="progress-text"><span id="current">1</span> / <span id="total">0</span></span>
+        <div class="header-actions" style="display:flex;gap:8px;">
+            <button class="icon-btn" id="mastered-btn" title="移出错题" style="display:none;" onclick="markAsMastered()">✓</button>
+            <button class="list-btn" onclick="togglePanel()">📋</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- 题目 -->
+        <div class="card">
+            <span class="card-type" id="q-type">多选题</span>
+            <div class="card-question" id="q-text">题目加载中...</div>
+        </div>
+
+        <!-- 答案 -->
+        <div class="answer-card">
+            <div class="answer-header">✅ 正确答案</div>
+            <div class="answer-text" id="answer-text">ABCD</div>
+            <div class="options-list" id="options-list"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <button class="btn btn-prev" onclick="prevCard()">← 上一题</button>
+        <button class="btn btn-next" onclick="nextCard()">下一题 →</button>
+    </footer>
+
+    <div class="hint">快捷键：← → 切换题目 · v1.2.0</div>
+
+    <!-- 遮罩 -->
+    <div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+    <!-- 题目列表面板 -->
+    <div class="question-panel" id="panel">
+        <div class="panel-header">
+            <h3>题目列表</h3>
+            <button class="close-btn" onclick="closePanel()">✕</button>
+        </div>
+        <div class="question-grid" id="question-grid"></div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/formatter.js"></script>
+    <script src="js/questions.js"></script>
+    <script>
+        let questions = [];
+        let currentIndex = 0;
+        let mode = 'all'; // 记录模式
+
+        function init() {
+            // 解析URL参数
+            const params = new URLSearchParams(window.location.search);
+            mode = params.get('mode') || 'all';
+            
+            if (mode === 'wrong') {
+                // 错题模式：只显示错题
+                const wrongIds = Storage.getWrongQuestionIds();
+                questions = maogaiQuestions.filter(q => wrongIds.includes(q.id));
+                if (questions.length === 0) {
+                    alert('暂无错题！');
+                    goBack();
+                    return;
+                }
+                // 显示"移出错题"按钮
+                document.getElementById('mastered-btn').style.display = 'block';
+            } else {
+                // 全部题目
+                questions = [...maogaiQuestions];
+                // 从上次位置继续
+                const progress = Storage.loadProgress();
+                if (progress.sequential > 0) {
+                    currentIndex = progress.sequential;
+                }
+            }
+            
+            document.getElementById('total').textContent = questions.length;
+            renderCard();
+            bindKeys();
+            renderQuestionGrid();
+        }
+
+        function renderCard() {
+            const q = questions[currentIndex];
+            if (!q) return;
+
+            document.getElementById('current').textContent = currentIndex + 1;
+            
+            // 题目类型
+            const typeNames = { single: '单选题', multiple: '多选题', judge: '判断题', fill: '填空题' };
+            document.getElementById('q-type').textContent = typeNames[q.type] || '选择题';
+            
+            // 题目文本
+            document.getElementById('q-text').textContent = q.question;
+
+            // 答案
+            const labels = 'ABCDEFGH';
+            let answerText = '';
+            let correctIndexes = [];
+
+            if (q.type === 'fill') {
+                answerText = q.answer;
+                document.getElementById('options-list').innerHTML = '';
+            } else {
+                correctIndexes = Array.isArray(q.answer) ? q.answer : [q.answer];
+                answerText = correctIndexes.map(i => labels[i]).join('、');
+
+                // 显示所有选项
+                const optionsHtml = q.options.map((opt, i) => {
+                    const isCorrect = correctIndexes.includes(i);
+                    return `
+                        <div class="option-item ${isCorrect ? 'correct' : ''}">
+                            <span class="option-letter">${labels[i]}.</span>
+                            <span>${opt}</span>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('options-list').innerHTML = optionsHtml;
+            }
+
+            document.getElementById('answer-text').textContent = answerText;
+            
+            // 保存进度
+            Storage.saveProgress('sequential', currentIndex);
+        }
+
+        function nextCard() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderCard();
+            } else {
+                alert('已浏览完所有题目！');
+                goBack();
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCard();
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function bindKeys() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    nextCard();
+                }
+                if (e.key === 'ArrowLeft') {
+                    prevCard();
+                }
+            });
+        }
+
+        // 题目列表功能
+        function renderQuestionGrid() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = '';
+            
+            questions.forEach((q, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'q-num';
+                btn.textContent = i + 1;
+                btn.onclick = () => jumpToQuestion(i);
+                grid.appendChild(btn);
+            });
+            
+            updateGridHighlight();
+        }
+
+        function updateGridHighlight() {
+            const buttons = document.querySelectorAll('.q-num');
+            buttons.forEach((btn, i) => {
+                btn.classList.toggle('current', i === currentIndex);
+            });
+        }
+
+        function jumpToQuestion(index) {
+            currentIndex = index;
+            renderCard();
+            updateGridHighlight();
+            closePanel();
+        }
+
+        function togglePanel() {
+            document.getElementById('panel').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+
+        function closePanel() {
+            document.getElementById('panel').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        // 标记为已掌握（移出错题）
+        function markAsMastered() {
+            const q = questions[currentIndex];
+            if (!q) return;
+            
+            if (confirm('确认已掌握此题？将从错题集移除')) {
+                Storage.removeFromWrongQuestions(q.id);
+                const masteredBtn = document.getElementById('mastered-btn');
+                masteredBtn.classList.add('mastered');
+                
+                setTimeout(() => {
+                    alert('已移出错题！');
+                    const remainingWrong = Storage.getWrongQuestionIds();
+                    if (remainingWrong.length === 0) {
+                        alert('恭喜！已清空所有错题！');
+                        goBack();
+                    } else {
+                        nextCard();
+                    }
+                }, 100);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

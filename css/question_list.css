@@ -1,0 +1,143 @@
+/* 在CSS末尾添加这些样式 */
+
+/* ========================================
+   Question List Panel
+   ======================================== */
+.question-list-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border-color);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.question-list-panel.active {
+    transform: translateX(0);
+}
+
+.question-list-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.question-list-header h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.legend {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+}
+
+.legend-dot.correct {
+    background: var(--accent-success);
+    border-color: var(--accent-success);
+}
+
+.legend-dot.wrong {
+    background: var(--accent-danger);
+    border-color: var(--accent-danger);
+}
+
+.legend-dot.unanswered {
+    background: #fbbf24;
+    border-color: #fbbf24;
+}
+
+.question-list-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--spacing-sm);
+    align-content: start;
+}
+
+.question-num-btn {
+    aspect-ratio: 1;
+    border: 2px solid var(--border-color);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.question-num-btn:hover {
+    border-color: var(--accent-primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.question-num-btn.active {
+    border-color: var(--accent-primary);
+    background: var(--accent-primary);
+    color: white;
+}
+
+.question-num-btn.correct {
+    background: var(--accent-success);
+    border-color: var(--accent-success);
+    color: white;
+}
+
+.question-num-btn.wrong {
+    background: var(--accent-danger);
+    border-color: var(--accent-danger);
+    color: white;
+}
+
+.question-num-btn.unanswered {
+    background: #fbbf24;
+    border-color: #fbbf24;
+    color: white;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .question-list-panel {
+        width: 100%;
+    }
+    
+    .question-list-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .question-list-grid {
+        grid-template-columns: repeat(5, 1fr);
+        padding: var(--spacing-md);
+    }
+}
