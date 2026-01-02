@@ -1,0 +1,21 @@
+# 临时文件
+*.txt
+*.pdf
+*.docx
+
+# Python文件（部署不需要）
+*.py
+__pycache__/
+*.pyc
+
+# 旧题库文件
+maogai_clean.json
+maogai_full.json
+parsed_questions.json
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 只保留 maogai_all.json 作为题库
+!maogai_all.json
